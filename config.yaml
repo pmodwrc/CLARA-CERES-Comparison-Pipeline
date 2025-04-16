@@ -1,0 +1,178 @@
+# config.yaml
+# This is the main configuration file for the data processing pipeline.
+# Each section contains parameters for different parts of the pipeline.
+
+# --------------------------------------------------------------------------- #
+# Module
+# --------------------------------------------------------------------------- #
+# Which 'module' should be executed
+# - 'Coordinates': Reads in the Position and Orientation Data of NorSat and
+#                  returns CLARA position data.
+# - 'Combination': Reads in CLARA position data (output from the 'Coordinates'
+#                  module) and CERES data and combines them.
+# - 'Both': Runs the other two modules in series
+module: 'Both'
+
+# --------------------------------------------------------------------------- #
+# Output
+# --------------------------------------------------------------------------- #
+# Define what the output should be
+output:
+    # Filters to be applied to the combined data
+    filters:
+        # the time difference between the NorSat position time and the CLARA
+        # olr measurement time. False = No filter applied
+        # values are to be given in seconds (float)
+        pos_olr_time_diff: False
+        # the mean time difference between the NorSat position time and the 
+        # matched CERES times. False = No filter applied
+        # values are to be given in minutes (float)
+        clara_ceres_time_diff: False
+    # What intermediate results should be saved and in what format.
+    save_intermediate:
+        # The CLARA_position is always saved as a .pkl file but can additionally
+        # be saved as a .csv file (True or False)
+        CLARA_position_csv: True
+        # The CLARA-CERES spatial_match can be saved as .pkl, .csv or both
+        # False = not saved
+        spatial_match: True
+        # The CLARA-CERES combination key can be saved as .pkl, .csv or both
+        # False = not saved
+        combination_key: 'both'
+        # The final combined CLARA-CERES netCDF without the Surface Map can 
+        # be saved as .pkl, .csv or both
+        # False = not saved
+        combined: 'both'
+
+# --------------------------------------------------------------------------- #
+# Directory
+# --------------------------------------------------------------------------- #
+# Here is defined where the different files are saved and how their filename is
+# structured. The filename is given by {prefix}{date string}{suffix}.filetype
+# e.g. CLARA_OLR_2020_1.save where 
+#    - prefix = 'CLARA_OLR_'
+#    - date string = '2020_1'
+#    - filetype = save
+# In this case there is no suffix (suffix = False)
+# The date string is a date in a specific date_format ('%Y_%m' here) and can
+# also be a date range, in which case the dates would be separated by a 
+# date_separator (date_separator = False here)
+directory:
+    # The NorSat Position and Orientation Data
+    norsat_pos:
+        folder: 'Data/Input/NorSat'
+        prefix: 'positionorientation_NorSat-1_sorted_'
+        suffix: False
+        date_format: '%Y-%m-%d'
+        # date_separator: False
+    # The CLARA OLR Data
+    clara_olr:
+        folder: 'Data/Input/CLARA_OLR'
+        prefix: 'CLARA_OLR_'
+        suffix: False
+        date_format: '%Y_%m'
+        date_separator: False
+    # The CERES data
+    ceres:
+        folder: 'Data/Input/CERES'
+        prefix: 'CERES_SSF_NOAA20-XTRK_Edition1B_Subset_'
+        suffix: False
+        date_format: '%Y%m%d%H'
+        date_separator: '-'
+    # The CLARA position/coordinate file calculated from the NorSat data using
+    # the 'Coordinate' module
+    clara_pos:
+        folder: 'Data/Intermediate/CLARA_Position'
+        prefix: 'CLARA_position_'
+        suffix: False
+        date_format: '%Y-%m'
+        date_separator: False
+    # The spatial match and combination key between CLARA and CERES data. 
+    # (Optional Intermediate result)
+    spatial_match:
+        folder: 'Data/Intermediate/SpatialMatch'
+        prefix: 'SpatialMatch_'
+        suffix: False
+        date_format: '%Y-%m'
+        date_separator: False
+    combination_key:
+        folder: 'Data/Intermediate/CombinationKey'
+        prefix: 'CombinationKey_'
+        suffix: False
+        date_format: '%Y-%m'
+        date_separator: False
+    # The combination of CLARA and CERES data.
+    combined:
+        folder: 'Data/Output'
+        prefix: 'combined_CLARA_CERES_'
+        suffix: False
+        date_format: '%Y-%m'
+        date_separator: False
+        
+
+# --------------------------------------------------------------------------- #
+# Parameters
+# --------------------------------------------------------------------------- #
+# set values that are needed to process the data
+parameters:
+    # The (half-)angle of CLARAs field of view (in degrees)
+    # at 4° the normalized response is at 50%
+    fov_angle: 4
+    # How many verices are used to calculate the footprint area of CLARA
+    # i.e. the footprint is a n-gon.
+    num_footprint_vertices: 10
+    # The maximally allowed view zenith angle. Chosen so that CLARA doesn't 
+    # look past the Earth.
+    max_view_zenith_angle: 65
+    # The bin size with which the CERES times are grouped together to find the
+    # matchin CERES data points. (in minutes)
+    time_bin_size: 5
+
+# --------------------------------------------------------------------------- #
+# Input File Structure
+# --------------------------------------------------------------------------- #
+# information about how the input files are structureed so that the correct
+# data can be found
+input_file_structure:
+    # NorSat Position and Orientation
+    norsat_pos:
+        time_format: '%Y-%m-%dT%H:%M:%S'
+        # The column names for the time, orientation quaternions and position
+        column_names:
+            time: '# datetime'
+            qx: 'qx'
+            qy: 'qy'
+            qz: 'qz'
+            qw: 'qw'
+            sx: 'sx'
+            sy: 'sy'
+            sz: 'sz'
+    # CLARA OLR data
+    clara_olr:
+        key: 'olr_all'
+        # Column names for the time/date and the radiance
+        column_names:
+            time: 'JDAY'
+            radiance: 'OLR'
+    # CERES data
+    ceres:
+        # Group Names within the netCDF file
+        group_names:
+            position: 'Time_and_Position'
+            radiance: 'Unfiltered_Radiances'
+            angles: 'Viewing_Angles'
+            surface: 'Surface_Map'
+        # Names of the variables (they still need to be in the correct group)
+        variable_names:
+            time: 'time'
+            fov_longitude: 'instrument_fov_longitude'
+            fov_colatitude: 'instrument_fov_colatitude'
+            subsat_longitude: 'subsatellite_longitude'
+            subsat_colatitude: 'subsatellite_colatitude'
+            radiance: 'longwave_radiance'
+            solar_zenith_angle: 'solar_zenith_angle'
+            view_zenith_angle: 'view_zenith_angle'
+            relative_azimuth_angle: 'relative_azimuth_angle'
+            surface_index: 'SurfType'
+            surface_type: 'surface_igbp_type'
+            surface_coverage: 'surface_igbp_type_coverage'
