@@ -112,8 +112,10 @@ pip install -r requirements.txt
 ## Usage Instructions
 ### 1. Setup the Configuration File
 Before running the pipeline, you need to adjust the **configuration file** (`config.yaml`) to point to your local data files and set parameters.
-### 2. Run the Pipeline
-Once you have configured the `config.yaml` file, you can rull the full pipeline using the `run_all.py` script. This will execute the in the configuration selected modules.
+### 2. Verify Input Files
+Ensure that all required input files are available in the directories specified in the `config.yaml` file.
+### 3. Run the Pipeline
+Once you have configured the `config.yaml` file and ensured the input files are available, you can rull the full pipeline using the `run_all.py` script. This will execute the in the configuration selected modules.
 ```bash
 python run_all.py
 ```
