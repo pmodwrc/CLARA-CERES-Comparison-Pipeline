@@ -349,5 +349,6 @@ The netCDF file contains the following data.
 </table>
 
 ## Further Reading
-For more information on how to use or adapt the pipeline for your specific needs, please refer to the [Research Report](references/reserach_report.pdf) associated with this project, which provides a deeper explanation of the methodology and implementation.
+For more information on how to use or adapt the pipeline for your specific needs, please refer to the [Research Report](references/research_report.pdf) associated with this project, which provides a deeper explanation of the methodology and implementation.
+
 
