@@ -1,0 +1,15 @@
+numpy
+pandas
+shapely
+pymap3d
+timezonefinder
+pytz
+python-dateutil
+pyyaml
+scipy
+xarray
+geopandas
+dask-geopandas
+pysolar
+tqdm
+netCDF4
